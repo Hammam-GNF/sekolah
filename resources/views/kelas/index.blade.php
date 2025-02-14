@@ -24,6 +24,7 @@
         @include('kelas.partials.scripts')
         @include('kelas.modals.create')
         @include('kelas.modals.edit')
+        @include('kelas.modals.detail')
     @endpush
 
 </x-app-layout>

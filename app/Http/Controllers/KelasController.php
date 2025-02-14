@@ -25,6 +25,23 @@ class KelasController extends Controller
         ]);
     }
 
+    public function getDetail($id)
+    {
+        $kelas = Kelas::with(['siswas', 'guru'])->find($id);
+
+        if (!$kelas) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Kelas tidak ditemukan'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 200,
+            'kelas' => $kelas
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

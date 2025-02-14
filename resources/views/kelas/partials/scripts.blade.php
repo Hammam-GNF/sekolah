@@ -34,7 +34,8 @@
                     "data": null,
                     "render": function (data, type, row) {
                         return '<a href="#" class="btn btn-sm btn-primary edit-btn" data-id="' + data.id + '" data-nama_kelas="' + data.nama_kelas + '"><i class="bi bi-pencil-fill"></i></a> ' +
-                            '<a href="#" class="btn btn-sm btn-danger delete-btn" data-id="' + data.id + '"><i class="bi bi-trash"></i></a>';
+                            '<a href="#" class="btn btn-sm btn-danger delete-btn" data-id="' + data.id + '"><i class="bi bi-trash"></i></a> ' +
+                            '<a href="#" class="btn btn-sm btn-info detail-btn" data-id="' + data.id + '"><i class="bi bi-eye-fill"></i></a>';
                     }
                 }
             ]
@@ -49,6 +50,58 @@
             $('#edit-nama_kelas').val(nama_kelas);
             
             $('#editModal').modal('show');
+        });
+
+        // Handle detail button click
+        $('#myTable tbody').on('click', '.detail-btn', function () {
+            var id = $(this).data('id');
+
+            $.ajax({
+                url: '{{ url("kelas/getDetail") }}/' + id,
+                type: 'GET',
+                data: { id: id },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 200) {
+                        var kelas = response.kelas;
+                        
+                        $('#detail-nama-kelas').text(kelas.nama_kelas);
+
+                        var siswaList = '';
+                        if (kelas.siswas.length > 0) {
+                            kelas.siswas.forEach(function (siswa) {
+                                siswaList += '<li class="list-group-item">' + siswa.nama_siswa + '</li>';
+                            });
+                        } else {
+                            siswaList = '<li class="list-group-item text-muted">Tidak ada siswa</li>';
+                        }
+                        $('#detail-siswa').html(siswaList);
+
+                        var guruList = '';
+                        if (kelas.guru) {
+                            guruList = '<li class="list-group-item">' + kelas.guru.nama_guru + '</li>';
+                        } else {
+                            guruList = '<li class="list-group-item text-muted">Tidak ada guru</li>';
+                        }
+                        $('#detail-guru').html(guruList);
+
+                        $('#detailModal').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Gagal mengambil data kelas!',
+                    });
+                }
+            });
         });
     });
 
