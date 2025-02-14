@@ -106,40 +106,63 @@
                 }
             });
         });
-    });
 
 
-    // Handle edit form submission
-    $('#edit-form').submit(function (e) {
-        e.preventDefault();
-        let formData = new FormData(this);
+        // Handle edit form submission
+        $('#edit-form').submit(function (e) {
+            e.preventDefault();
+        
+            let formData = new FormData($('#edit-form')[0]);
 
-        $.ajax({
-            url: '{{ route("kelas.update") }}',
-            method: 'POST',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            dataType: 'json',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function (response) {
-                if (response.status === 200) {
-                    Swal.fire("Berhasil!", response.message, "success");
-                    $('#edit-form')[0].reset();
-                    $('#editModal').modal('hide');
-                    table.ajax.reload();
-                } else {
-                    Swal.fire("Gagal!", response.message, "error");
+            $.ajax({
+                url: '{{ route("kelas.update") }}',
+                method: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: 'json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        $('#edit-form')[0].reset();
+                        $('#editModal').modal('hide');
+                        $('#editModal').on('hidden.bs.modal', function () {
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').remove();
+                        });
+                        $('#myTable').DataTable().ajax.reload();
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        if (errors.nama_kelas) {
+                            $('#edit-nama_kelas').addClass('is-invalid');
+                            $('#error-edit-nama_kelas').text(errors.nama_kelas[0]);
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan! Silakan coba lagi.',
+                        });
+                    }
                 }
-            },
-            error: function () {
-                Swal.fire("Error!", "Terjadi kesalahan.", "error");
-            }
+            });
         });
     });
+
 
     // Handle delete button click
     $(document).on('click', '.delete-btn', function () {

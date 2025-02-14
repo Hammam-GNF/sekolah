@@ -25,7 +25,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/kelas/store', [KelasController::class, 'store'])->name('kelas.store');
     Route::get('/kelas/{id}/edit', [KelasController::class, 'edit'])->name('kelas.edit');
     Route::post('/kelas/update', [KelasController::class, 'update'])->name('kelas.update');
-
     Route::delete('/kelas/delete/{id}', [KelasController::class, 'destroy'])->name('kelas.delete');
 
     // Guru
