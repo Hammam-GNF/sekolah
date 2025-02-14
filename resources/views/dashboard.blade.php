@@ -20,6 +20,28 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                {{ __("List Siswa berdasarkan Kelas") }}
+                    @include('partials.siswaPerkelas')
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-4">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                {{ __("List Guru berdasarkan Kelas") }}
+                    @include('partials.guruPerKelas')
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-4">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
                 {{ __("List Siswa Kelas Guru") }}
                     @include('partials.allin')
                 </div>
