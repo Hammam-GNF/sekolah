@@ -25,6 +25,15 @@ class SiswaController extends Controller
         ]);
     }
 
+    public function count()
+    {
+        $totalSiswa = Siswa::count();
+        return response()->json([
+            'status' => 200,
+            'totalSiswa' => $totalSiswa
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

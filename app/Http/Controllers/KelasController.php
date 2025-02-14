@@ -15,6 +15,7 @@ class KelasController extends Controller
     {
         return view('kelas.index');
     }
+
     public function getall()
     {
         $kelas = Kelas::all();
@@ -22,6 +23,15 @@ class KelasController extends Controller
         return response()->json([
             'status' => 200,
             'kelas' => $kelas
+        ]);
+    }
+
+    public function count()
+    {
+        $totalKelas = Kelas::count();
+        return response()->json([
+            'status' => 200,
+            'totalKelas' => $totalKelas
         ]);
     }
 

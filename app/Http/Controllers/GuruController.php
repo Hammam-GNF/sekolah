@@ -26,6 +26,15 @@ class GuruController extends Controller
         ]);
     }
 
+    public function count()
+    {
+        $totalGuru = Guru::count();
+        return response()->json([
+            'status' => 200,
+            'totalGuru' => $totalGuru
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
