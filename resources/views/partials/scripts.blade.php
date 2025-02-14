@@ -1,8 +1,5 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/2.1.2/js/dataTables.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 
 <script>
     $(document).ready(function () {
@@ -49,4 +46,84 @@
             }
         });
     });
+
+
+
+    $(document).ready(function () {
+        var table = $('#myTable').DataTable({
+            "ajax": {
+                "url": "{{ route('kelas.getall') }}",
+                "type": "GET",
+                "dataType": "json",
+                "headers": {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                "dataSrc": function (response) {
+                    return response.status === 200 ? response.kelas.map((item, index) => {
+                        item.iteration = index + 1;
+                        return item;
+                    }) : [];
+                }
+            },
+            "columns": [
+                {
+                    "data": "iteration",
+                    "className": "text-center"
+                },
+                {
+                    "data": "nama_kelas"
+                },
+                {
+                    "data": null,
+                    "defaultContent": "Memuat...",
+                    "render": function () {
+                        return '<ul class="list-guru"></ul>';
+                    }
+                },
+                {
+                    "data": null,
+                    "defaultContent": "Memuat...",
+                    "render": function () {
+                        return '<ul class="list-siswa"></ul>';
+                    }
+                }
+            ],
+            "rowCallback": function (row, data) {
+                var $guruCell = $(row).find('.list-guru');
+                var $siswaCell = $(row).find('.list-siswa');
+
+                $.ajax({
+                    "url": "{{ url('/kelas/getGuru') }}/" + data.id,
+                    "type": "GET",
+                    "success": function (response) {
+                        $guruCell.empty();
+                        if (response.data.length > 0) {
+                            response.data.forEach(function (guru) {
+                                $guruCell.append('<li>' + guru.nama_guru + '</li>');
+                            });
+                        } else {
+                            $guruCell.append('<li>Tidak ada guru</li>');
+                        }
+                    }
+                });
+
+                $.ajax({
+                    "url": "{{ url('/kelas/getSiswa') }}/" + data.id,
+                    "type": "GET",
+                    "success": function (response) {
+                        $siswaCell.empty();
+                        if (response.data.length > 0) {
+                            response.data.forEach(function (siswa) {
+                                $siswaCell.append('<li>' + siswa.nama_siswa + '</li>');
+                            });
+                        } else {
+                            $siswaCell.append('<li>Tidak ada siswa</li>');
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+
 </script>

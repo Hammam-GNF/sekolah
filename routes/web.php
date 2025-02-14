@@ -26,6 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/kelas/update', [KelasController::class, 'update'])->name('kelas.update');
     Route::delete('/kelas/delete/{id}', [KelasController::class, 'destroy'])->name('kelas.delete');
     Route::get('/kelas/count', [KelasController::class, 'count'])->name('kelas.count');
+    Route::get('/kelas/getSiswa/{id}', [KelasController::class, 'getSiswa'])->name('kelas.getSiswa');
+    Route::get('/kelas/getGuru/{id}', [KelasController::class, 'getGuru'])->name('kelas.getGuru');
     Route::get('/kelas/getDetail/{id}', [KelasController::class, 'getDetail'])->name('kelas.getDetail');
 
 

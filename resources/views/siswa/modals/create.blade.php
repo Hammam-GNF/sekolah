@@ -22,7 +22,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="submit" class="btn btn-primary" id="save-siswa" form="siswa-form">Simpan</button>
+                <button type="submit" class="btn btn-primary" form="siswa-form">Simpan</button>
             </div>
         </div>
     </div>

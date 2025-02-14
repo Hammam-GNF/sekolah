@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Guru;
 use App\Models\Kelas;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,6 +36,23 @@ class KelasController extends Controller
             'totalKelas' => $totalKelas
         ]);
     }
+
+    public function getSiswa($id)
+    {
+        $siswa = Siswa::where('kelas_id', $id)->get();
+        return response()->json([
+            'data' => $siswa 
+        ]);
+    }
+
+    public function getGuru($id)
+    {
+        $guru = Guru::where('kelas_id', $id)->get();
+        return response()->json([
+            'data' => $guru
+        ]);
+    }
+
 
     public function getDetail($id)
     {

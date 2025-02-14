@@ -14,11 +14,14 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 "dataSrc": function(response) {
-                    return response.status === 200 ? response.guru : [];
+                    return response.status === 200 ? response.guru.map((item, index) => {
+                        item.iteration = index + 1;
+                        return item;
+                    }) : [];
                 }
             },
             "columns": [{
-                    "data": "id",
+                    "data": "iteration",
                     "className": "text-center"
                 },
                 {
@@ -78,110 +81,46 @@
         $('#editModal').modal('show');
     });
 
-     // Handle add form submission
+    // Handle add & edit form submission
     $(document).ready(function () {
-        $('#save-guru').click(function (e) {
+        var table = $("#myTable").DataTable();
+        $('#guru-form, #edit-form').submit(function(e) {
             e.preventDefault();
-            
-            let formData = new FormData($('#guru-form')[0]);
-            
-            $.ajax({
-                url: '{{ route("guru.store") }}',
-                type: 'POST',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-
-                        $('#guru-form')[0].reset();
-                        $('#createModal').modal('hide');
-                        $('#createModal').on('hidden.bs.modal', function () {
-                            $('body').removeClass('modal-open');
-                            $('.modal-backdrop').remove();
-                        });
-                        $('#myTable').DataTable().ajax.reload();
-                    }
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        if (errors.nama_guru) {
-                            $('#nama_guru').addClass('is-invalid');
-                            $('#error-nama_guru').text(errors.nama_guru[0]);
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan! Silakan coba lagi.',
-                        });
-                    }
-                }
-            });
-        });
-
-        // Handle edit form submission
-        $('#edit-form').submit(function (e) {
-            e.preventDefault();
-        
-            let formData = new FormData($('#edit-form')[0]);
+            let form = $(this);
+            let isEdit = form.attr('id') === 'edit-form';
+            let url = isEdit ? '{{ route("guru.update") }}' : '{{ route("guru.store") }}';
 
             $.ajax({
-                url: '{{ route("guru.update") }}',
+                url: url,
                 method: 'POST',
-                data: formData,
+                data: new FormData(this),
                 cache: false,
                 contentType: false,
                 processData: false,
                 dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function(response) {
                     if (response.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
+                        Swal.fire({ title: "Berhasil!", text: response.message, icon: "success", timer: 2000, showConfirmButton: false });
+                        form[0].reset();
+                        let modalId = isEdit ? '#editModal' : '#createModal';
 
-                        $('#edit-form')[0].reset();
-                        $('#editModal').modal('hide');
-                        $('#editModal').on('hidden.bs.modal', function () {
-                            $('body').removeClass('modal-open');
-                            $('.modal-backdrop').remove();
-                        });
-                        $('#myTable').DataTable().ajax.reload();
+                        $(modalId).modal('hide'); 
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open').css('overflow', 'auto');
+                        $('html').css('overflow', 'auto');
+                        $(modalId).attr('aria-hidden', 'false');
+                        
+                        table.ajax.reload();
                     }
                 },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        if (errors.nama_guru) {
-                            $('#edit-nama_guru').addClass('is-invalid');
-                            $('#error-edit-nama_guru').text(errors.nama_guru[0]);
-                        }
+                error: function(xhr) {
+                    let errors = xhr.responseJSON?.errors;
+                    if (xhr.status === 422 && errors?.nama_kelas) {
+                        $('#edit-nama_kelas').addClass('is-invalid');
+                        $('#error-edit-nama_kelas').text(errors.nama_kelas[0]);
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan! Silakan coba lagi.',
-                        });
+                        Swal.fire({ icon: 'error', title: 'Oops...', text: 'Terjadi kesalahan! Silakan coba lagi.' });
                     }
                 }
             });

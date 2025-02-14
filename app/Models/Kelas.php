@@ -19,6 +19,6 @@ class Kelas extends Model
 
     public function guru()
     {
-        return $this->hasOne(Guru::class);
+        return $this->hasMany(Guru::class);
     }
 }

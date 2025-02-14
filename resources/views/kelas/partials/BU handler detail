@@ -1,0 +1,50 @@
+$('#myTable tbody').on('click', '.detail-btn', function () {
+            var id = $(this).data('id');
+
+            $.ajax({
+                url: '{{ url("kelas/getDetail") }}/' + id,
+                type: 'GET',
+                data: { id: id },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 200) {
+                        var kelas = response.kelas;
+                        
+                        $('#detail-nama-kelas').text(kelas.nama_kelas);
+
+                        var siswaTable = '';
+                        if (kelas.siswas.length > 0) {
+                            kelas.siswas.forEach(function (siswa, index) {
+                                siswaTable += '<tr><td>' + (index + 1) + '</td><td>' + siswa.nama_siswa + '</td></tr>';
+                            });
+                        } else {
+                            siswaTable = '<tr><td colspan="2" class="text-center">Tidak ada siswa</td></tr>';
+                        }
+                        $('#detail-siswa').html(siswaTable);
+
+                        var guruTable = '';
+                        if (kelas.guru) {
+                            guruTable = '<tr><td>' + kelas.guru.nama_guru + '</td></tr>';
+                        } else {
+                            guruTable = '<tr><td class="text-center">Tidak ada guru</td></tr>';
+                        }
+                        $('#detail-guru').html(guruTable);
+
+                        $('#detailModal').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message,
+                        });
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Gagal mengambil data kelas!',
+                    });
+                }
+            });
+        });

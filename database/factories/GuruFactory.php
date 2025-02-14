@@ -19,17 +19,7 @@ class GuruFactory extends Factory
      */
     public function definition(): array
     {
-        static $usedKelasIds = [];
-        $kelas = Kelas::doesntHave('guru')
-            ->whereNotIn('id', $usedKelasIds)
-            ->inRandomOrder()
-            ->first();
-
-        if (!$kelas) {
-            $kelas = Kelas::factory()->create();
-        }
-
-        $usedKelasIds[] = $kelas->id;
+        $kelas = Kelas::inRandomOrder()->first() ?? Kelas::factory()->create();
 
         return [
             'nama_guru' => $this->faker->name(),

@@ -1,6 +1,6 @@
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+{{-- <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
@@ -35,7 +35,9 @@
                     "render": function (data, type, row) {
                         return '<a href="#" class="btn btn-sm btn-primary edit-btn" data-id="' + data.id + '" data-nama_kelas="' + data.nama_kelas + '"><i class="bi bi-pencil-fill"></i></a> ' +
                             '<a href="#" class="btn btn-sm btn-danger delete-btn" data-id="' + data.id + '"><i class="bi bi-trash"></i></a> ' +
-                            '<a href="#" class="btn btn-sm btn-info detail-btn" data-id="' + data.id + '"><i class="bi bi-eye-fill"></i></a>';
+                            '<button data-bs-toggle="modal" data-bs-target="#modalDetailKelas" data-kelas-id="' + data.id + '" data-nama-kelas="' + data.nama_kelas + '" class="btn btn-sm btn-info"><i class="bi bi-eye-fill"></i> All in </button>' +
+                            '<button data-bs-toggle="modal" data-bs-target="#modalDetailKelasSiswa" data-kelas-id="' + data.id + '" data-nama-kelas="' + data.nama_kelas + '" class="btn btn-sm btn-info"><i class="bi bi-eye-fill"></i> Siswa aja </button>' +
+                            '<button data-bs-toggle="modal" data-bs-target="#modalDetailKelasGuru" data-kelas-id="' + data.id + '" data-nama-kelas="' + data.nama_kelas + '" class="btn btn-sm btn-info"><i class="bi bi-eye-fill"></i> Guru aja </button>';
                     }
                 }
             ]
@@ -53,163 +55,146 @@
         });
 
         // Handle detail button click
-        $('#myTable tbody').on('click', '.detail-btn', function () {
-            var id = $(this).data('id');
+        $('#modalDetailKelas').on('show.bs.modal', function(event) {
+            let button = $(event.relatedTarget);
+            let kelasId = button.data('kelas-id');
+            let namaKelas = button.data('nama-kelas');
 
-            $.ajax({
-                url: '{{ url("kelas/getDetail") }}/' + id,
-                type: 'GET',
-                data: { id: id },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.status === 200) {
-                        var kelas = response.kelas;
-                        
-                        $('#detail-nama-kelas').text(kelas.nama_kelas);
+            $('#namaKelas').text(`Kelas: ${namaKelas}`);
+            
+            if ($.fn.DataTable.isDataTable('#tableSiswa')) {
+                $('#tableSiswa').DataTable().destroy();
+            }
+            if ($.fn.DataTable.isDataTable('#tableGuru')) {
+                $('#tableGuru').DataTable().destroy();
+            }
 
-                        var siswaList = '';
-                        if (kelas.siswas.length > 0) {
-                            kelas.siswas.forEach(function (siswa) {
-                                siswaList += '<li class="list-group-item">' + siswa.nama_siswa + '</li>';
-                            });
-                        } else {
-                            siswaList = '<li class="list-group-item text-muted">Tidak ada siswa</li>';
-                        }
-                        $('#detail-siswa').html(siswaList);
-
-                        var guruList = '';
-                        if (kelas.guru) {
-                            guruList = '<li class="list-group-item">' + kelas.guru.nama_guru + '</li>';
-                        } else {
-                            guruList = '<li class="list-group-item text-muted">Tidak ada guru</li>';
-                        }
-                        $('#detail-guru').html(guruList);
-
-                        $('#detailModal').modal('show');
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: response.message,
-                        });
-                    }
-                },
-                error: function () {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Gagal mengambil data kelas!',
-                    });
+            // Ambil data siswa
+            $('#tableSiswa').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: `/kelas/getSiswa/${kelasId}`,
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: 'nama_siswa' }
+                ],
+                language: {
+                    emptyTable: "Tidak ada siswa"
                 }
             });
-        });
-    });
 
-     // Handle add form submission
-    $(document).ready(function () {
-        $('#save-kelas').click(function (e) {
-            e.preventDefault();
-            
-            let formData = new FormData($('#kelas-form')[0]);
-            
-            $.ajax({
-                url: '{{ route("kelas.store") }}',
-                type: 'POST',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
-
-                        $('#kelas-form')[0].reset();
-                        $('#createModal').modal('hide');
-                        $('#createModal').on('hidden.bs.modal', function () {
-                            $('body').removeClass('modal-open');
-                            $('.modal-backdrop').remove();
-                        });
-                        $('#myTable').DataTable().ajax.reload();
-                    }
-                },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        if (errors.nama_kelas) {
-                            $('#nama_kelas').addClass('is-invalid');
-                            $('#error-nama_kelas').text(errors.nama_kelas[0]);
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan! Silakan coba lagi.',
-                        });
-                    }
+            // Ambil data guru
+            $('#tableGuru').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: `/kelas/getGuru/${kelasId}`,
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: 'nama_guru' }
+                ],
+                language: {
+                    emptyTable: "Tidak ada guru"
                 }
             });
         });
 
+        // Handle detailKelasSiswa button click
+        $('#modalDetailKelasSiswa').on('show.bs.modal', function(event) {
+            let button = $(event.relatedTarget);
+            if (!button.length) return;
 
-        // Handle edit form submission
-        $('#edit-form').submit(function (e) {
+            let kelasId = button.data('kelas-id');
+            let namaKelas = button.data('nama-kelas');
+
+            $('#namaKelasSiswa').text(`Kelas: ${namaKelas}`);
+            
+            if ($.fn.DataTable.isDataTable('#tableSiswaAja')) {
+                $('#tableSiswaAja').DataTable().destroy();
+            }
+
+            // Ambil data siswa
+            $('#tableSiswaAja').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: `/kelas/getSiswa/${kelasId}`,
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: 'nama_siswa' }
+                ],
+                language: {
+                    emptyTable: "Tidak ada siswa"
+                }
+            });
+        });
+
+        // Handle detailKelasGuru button click
+        $('#modalDetailKelasGuru').on('show.bs.modal', function(event) {
+            let button = $(event.relatedTarget);
+            if (!button.length) return;
+
+            let kelasId = button.data('kelas-id');
+            let namaKelas = button.data('nama-kelas');
+
+            $('#namaKelasGuru').text(`Kelas: ${namaKelas}`);
+            
+            if ($.fn.DataTable.isDataTable('#tableGuruAja')) {
+                $('#tableGuruAja').DataTable().destroy();
+            }
+
+            // Ambil data Guru
+            $('#tableGuruAja').DataTable({
+                processing: true,
+                serverSide: false,
+                ajax: `/kelas/getGuru/${kelasId}`,
+                columns: [
+                    { data: null, render: (data, type, row, meta) => meta.row + 1 },
+                    { data: 'nama_guru' }
+                ],
+                language: {
+                    emptyTable: "Tidak ada guru"
+                }
+            });
+        });
+
+        // handle add & edit
+        $('#kelas-form, #edit-form').submit(function(e) {
             e.preventDefault();
-        
-            let formData = new FormData($('#edit-form')[0]);
+            let form = $(this);
+            let isEdit = form.attr('id') === 'edit-form';
+            let url = isEdit ? '{{ route("kelas.update") }}' : '{{ route("kelas.store") }}';
 
             $.ajax({
-                url: '{{ route("kelas.update") }}',
+                url: url,
                 method: 'POST',
-                data: formData,
+                data: new FormData(this),
                 cache: false,
                 contentType: false,
                 processData: false,
                 dataType: 'json',
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
+                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                success: function(response) {
                     if (response.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: response.message,
-                            showConfirmButton: false,
-                            timer: 2000
-                        });
+                        Swal.fire({ title: "Berhasil!", text: response.message, icon: "success", timer: 2000, showConfirmButton: false });
+                        form[0].reset();
+                        let modalId = isEdit ? '#editModal' : '#createModal';
 
-                        $('#edit-form')[0].reset();
-                        $('#editModal').modal('hide');
-                        $('#editModal').on('hidden.bs.modal', function () {
-                            $('body').removeClass('modal-open');
-                            $('.modal-backdrop').remove();
-                        });
-                        $('#myTable').DataTable().ajax.reload();
+                        // Menutup modal dengan benar
+                        $(modalId).modal('hide'); 
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open').css('overflow', 'auto');
+                        $('html').css('overflow', 'auto');
+                        $(modalId).attr('aria-hidden', 'false');
+
+                        table.ajax.reload();
                     }
                 },
-                error: function (xhr) {
-                    if (xhr.status === 422) {
-                        let errors = xhr.responseJSON.errors;
-                        if (errors.nama_kelas) {
-                            $('#edit-nama_kelas').addClass('is-invalid');
-                            $('#error-edit-nama_kelas').text(errors.nama_kelas[0]);
-                        }
+                error: function(xhr) {
+                    let errors = xhr.responseJSON?.errors;
+                    if (xhr.status === 422 && errors?.nama_kelas) {
+                        $('#edit-nama_kelas').addClass('is-invalid');
+                        $('#error-edit-nama_kelas').text(errors.nama_kelas[0]);
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Terjadi kesalahan! Silakan coba lagi.',
-                        });
+                        Swal.fire({ icon: 'error', title: 'Oops...', text: 'Terjadi kesalahan! Silakan coba lagi.' });
                     }
                 }
             });
@@ -252,16 +237,5 @@
             }
         });
     });
-
-
-        
-
-    function focusNextInput(event) {
-        const inputs = document.querySelectorAll('#petugas-form input');
-        let index = Array.prototype.indexOf.call(inputs, event.target);
-        if (index > -1 && index < inputs.length - 1) {
-            inputs[index + 1].focus();
-        }
-    }
 
 </script>

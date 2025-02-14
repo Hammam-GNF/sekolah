@@ -25,6 +25,8 @@
         @include('kelas.modals.create')
         @include('kelas.modals.edit')
         @include('kelas.modals.detail')
+        @include('kelas.modals.siswaKelas')
+        @include('kelas.modals.guruKelas')
     @endpush
 
 </x-app-layout>
