@@ -69,7 +69,6 @@
                 $('#tableGuru').DataTable().destroy();
             }
 
-            // Ambil data siswa
             $('#tableSiswa').DataTable({
                 processing: true,
                 serverSide: false,
@@ -83,7 +82,6 @@
                 }
             });
 
-            // Ambil data guru
             $('#tableGuru').DataTable({
                 processing: true,
                 serverSide: false,
@@ -112,7 +110,6 @@
                 $('#tableSiswaAja').DataTable().destroy();
             }
 
-            // Ambil data siswa
             $('#tableSiswaAja').DataTable({
                 processing: true,
                 serverSide: false,
@@ -141,7 +138,6 @@
                 $('#tableGuruAja').DataTable().destroy();
             }
 
-            // Ambil data Guru
             $('#tableGuruAja').DataTable({
                 processing: true,
                 serverSide: false,
@@ -178,7 +174,6 @@
                         form[0].reset();
                         let modalId = isEdit ? '#editModal' : '#createModal';
 
-                        // Menutup modal dengan benar
                         $(modalId).modal('hide'); 
                         $('.modal-backdrop').remove();
                         $('body').removeClass('modal-open').css('overflow', 'auto');
