@@ -36,7 +36,7 @@
                 {
                     "data": null,
                     "render": function(data, type, row) {
-                        return '<a href="#" class="btn btn-sm btn-primary edit-btn" data-id="' + data.id + '" data-nama_guru="' + data.nama_guru + '" data-nama_kelas="' + data.nama_kelas + '"><i class="bi bi-pencil-fill"></i></a> ' +
+                        return '<a href="#" class="btn btn-sm btn-primary edit-btn" data-id="' + data.id + '" data-nama_guru="' + data.nama_guru + '" data-kelas_id="' + data.kelas_id + '"><i class="bi bi-pencil-fill"></i></a> ' +
                             '<a href="#" class="btn btn-sm btn-danger delete-btn" data-id="' + data.id + '"><i class="bi bi-trash"></i></a>';
                     }
                 }
@@ -48,11 +48,32 @@
     $(document).on('click', '.edit-btn', function () {
         var id = $(this).data('id');
         var nama_guru = $(this).data('nama_guru');
-        var nama_kelas = $(this).data('nama_kelas');
+        var kelas_id = $(this).data('kelas_id');
 
         $('#edit-id').val(id);
         $('#edit-nama_guru').val(nama_guru);
-        $('#edit-nama_kelas').val(nama_kelas);
+
+        $.ajax({
+            url: "{{ route('kelas.getall') }}",
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                let kelasDropdown = $('#edit-nama_kelas');
+                kelasDropdown.empty();
+                kelasDropdown.append('<option value="">---Pilih Kelas---</option>');
+
+                $.each(response.kelas, function (index, kelas) {
+                    kelasDropdown.append('<option value="' + kelas.id + '">' + kelas.nama_kelas + '</option>');
+                });
+
+                if (kelas_id) {
+                    kelasDropdown.val(kelas_id);
+                }
+            },
+            error: function () {
+                Swal.fire('Error', 'Gagal mengambil data kelas', 'error');
+            }
+        });
 
         $('#editModal').modal('show');
     });
@@ -111,33 +132,61 @@
                 }
             });
         });
-    });
 
-
-    // Handle edit form submission
-     $('#edit-form').submit(function(e) {
+        // Handle edit form submission
+        $('#edit-form').submit(function (e) {
             e.preventDefault();
-            let id = $('#edit-id').val();
-            let formData = $(this).serialize();
+        
+            let formData = new FormData($('#edit-form')[0]);
 
             $.ajax({
-                url: '{{ url("guru/update") }}/' + id,
-                type: 'PUT',
+                url: '{{ route("guru.update") }}',
+                method: 'POST',
                 data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                dataType: 'json',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                success: function(response) {
-                    Swal.fire('Berhasil!', response.message, 'success');
-                    $('#edit-form')[0].reset();
-                    $('#editModal').modal('hide');
-                    table.ajax.reload();
+                success: function (response) {
+                    if (response.status === 200) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+
+                        $('#edit-form')[0].reset();
+                        $('#editModal').modal('hide');
+                        $('#editModal').on('hidden.bs.modal', function () {
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').remove();
+                        });
+                        $('#myTable').DataTable().ajax.reload();
+                    }
                 },
-                error: function() {
-                    Swal.fire('Gagal!', 'Terjadi kesalahan.', 'error');
+                error: function (xhr) {
+                    if (xhr.status === 422) {
+                        let errors = xhr.responseJSON.errors;
+                        if (errors.nama_guru) {
+                            $('#edit-nama_guru').addClass('is-invalid');
+                            $('#error-edit-nama_guru').text(errors.nama_guru[0]);
+                        }
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan! Silakan coba lagi.',
+                        });
+                    }
                 }
             });
         });
+    });
 
     // Handle delete button click
     $(document).on('click', '.delete-btn', function () {
@@ -175,6 +224,7 @@
         });
     });
 
+    //
     $(document).ready(function () {
         $('#createModal').on('show.bs.modal', function () {
             $.ajax({
@@ -189,6 +239,11 @@
                     $.each(response.kelas, function (index, kelas) {
                         kelasDropdown.append('<option value="' + kelas.id + '">' + kelas.nama_kelas + '</option>');
                     });
+
+                    let selectedKelas = $('#edit-nama_kelas').data('selected');
+                    if (selectedKelas) {
+                        $('#edit-nama_kelas').val(selectedKelas).trigger('change');
+                    }
                 },
                 error: function () {
                     Swal.fire('Error', 'Gagal mengambil data kelas', 'error');

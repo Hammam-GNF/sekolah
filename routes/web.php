@@ -31,14 +31,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/guru', [GuruController::class, 'index'])->name('guru.index');
     Route::get('/guru/getall', [GuruController::class, 'getall'])->name('guru.getall');
     Route::post('/guru/store', [GuruController::class, 'store'])->name('guru.store');
-    Route::put('/guru/update/{id}', [GuruController::class, 'update'])->name('guru.update');
+    Route::post('/guru/update', [GuruController::class, 'update'])->name('guru.update');
     Route::delete('/guru/delete/{id}', [GuruController::class, 'destroy'])->name('guru.delete');
 
     // Siswa
     Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
     Route::get('/siswa/getall', [SiswaController::class, 'getall'])->name('siswa.getall');
     Route::post('/siswa/store', [SiswaController::class, 'store'])->name('siswa.store');
-    Route::put('/siswa/update/{id}', [SiswaController::class, 'update'])->name('siswa.update');
+    Route::post('/siswa/update', [SiswaController::class, 'update'])->name('siswa.update');
     Route::delete('/siswa/delete/{id}', [SiswaController::class, 'destroy'])->name('siswa.delete');
 
 });

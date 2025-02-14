@@ -82,9 +82,10 @@ class SiswaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:siswas,id',
             'nama_siswa' => 'required|string|max:255',
             'kelas_id' => 'required|exists:kelas,id',
         ]);
@@ -97,7 +98,7 @@ class SiswaController extends Controller
             ], 422);
         }
 
-        $siswa = Siswa::find($id);
+        $siswa = Siswa::find($request->id);
         if ($siswa) {
             $siswa->update($request->only(['nama_siswa', 'kelas_id']));
             return response()->json([
@@ -107,8 +108,7 @@ class SiswaController extends Controller
         } else {
             return response()->json([
                 'status' => 404,
-                'message' => 'siswa not found',
-                'siswa' => $siswa
+                'message' => 'Siswa not found'
             ]);
         }
     }

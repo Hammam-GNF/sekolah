@@ -18,7 +18,7 @@
                     <div class="row">
                         <div class="col-lg">
                             <label>Nama Kelas</label>
-                            <select id="edit-nama_kelas" name="nama_kelas" class="form-control">
+                            <select id="edit-nama_kelas" name="kelas_id" class="form-control">
                                 <option value="">--- Pilih Kelas ---</option>
                             </select>
                         </div>

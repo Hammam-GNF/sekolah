@@ -83,10 +83,10 @@ class GuruController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:guru,id',
+            'id' => 'required|exists:gurus,id',
             'nama_guru' => 'required|string|max:255',
             'kelas_id' => 'required|exists:kelas,id',
         ]);
@@ -99,7 +99,7 @@ class GuruController extends Controller
             ], 422);
         }
 
-        $guru = Guru::find($id);
+        $guru = Guru::find($request->id);
         if ($guru) {
             $guru->update($request->only(['nama_guru', 'kelas_id']));
             return response()->json([
@@ -109,8 +109,7 @@ class GuruController extends Controller
         } else {
             return response()->json([
                 'status' => 404,
-                'message' => 'guru not found',
-                'guru' => $guru
+                'message' => 'guru not found'
             ]);
         }
     }
