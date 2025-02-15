@@ -21,6 +21,9 @@
                     <x-nav-link :href="route('guru.index')" :active="request()->routeIs('guru.index')">
                         {{ __('Guru') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('ortu.index')" :active="request()->routeIs('ortu.index')">
+                        {{ __('Orang Tua') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('siswa.index')" :active="request()->routeIs('siswa.index')">
                         {{ __('Siswa') }}
                     </x-nav-link>

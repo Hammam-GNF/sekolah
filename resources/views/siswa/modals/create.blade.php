@@ -18,6 +18,12 @@
                             <option value="">---Pilih Kelas---</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="nama_ortu" class="form-label">Nama Ortu</label>
+                        <select name="ortu_id" id="ortu_id" class="form-control" required>
+                            <option value="">---Pilih Ortu---</option>
+                        </select>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

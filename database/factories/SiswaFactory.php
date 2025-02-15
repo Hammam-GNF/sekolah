@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Kelas;
+use App\Models\orangTua;
 use App\Models\Siswa;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,10 +21,12 @@ class SiswaFactory extends Factory
     public function definition(): array
     {
         $kelas = Kelas::inRandomOrder()->first() ?? Kelas::factory()->create();
+        $ortu = orangTua::inRandomOrder()->first() ?? orangTua::factory()->create();
 
         return [
             'nama_siswa' => $this->faker->name(),
             'kelas_id' => $kelas->id,
+            'ortu_id' => $ortu->id,
         ];
     }
 }

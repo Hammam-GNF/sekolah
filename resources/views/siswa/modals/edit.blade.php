@@ -23,6 +23,14 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-lg">
+                            <label>Nama Ortu</label>
+                            <select id="edit-nama_ortu" name="ortu_id" class="form-control">
+                                <option value="">--- Pilih Ortu ---</option>
+                            </select>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

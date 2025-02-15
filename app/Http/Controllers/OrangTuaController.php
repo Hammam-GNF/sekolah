@@ -2,35 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Siswa;
+use App\Models\orangTua;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class SiswaController extends Controller
+class OrangTuaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('siswa.index');
+        return view('ortu.index');
     }
+
     public function getall()
     {
-        $siswa = Siswa::with('kelas', 'ortu')->get();
+        $ortu = orangTua::all();
 
         return response()->json([
             'status' => 200,
-            'siswa' => $siswa
-        ]);
-    }
-
-    public function count()
-    {
-        $totalSiswa = Siswa::count();
-        return response()->json([
-            'status' => 200,
-            'totalSiswa' => $totalSiswa
+            'ortu' => $ortu
         ]);
     }
 
@@ -48,9 +40,7 @@ class SiswaController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nama_siswa' => 'required|string|max:255',
-            'kelas_id' => 'required|exists:kelas,id',
-            'ortu_id' => 'required|exists:orang_tuas,id',
+            'nama_ortu' => 'required|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -61,23 +51,21 @@ class SiswaController extends Controller
             ], 422);
         }
 
-        $siswa = Siswa::create([
-            'nama_siswa' => $request->nama_siswa,
-            'kelas_id' => $request->kelas_id,
-            'ortu_id' => $request->ortu_id
+        $ortu = orangTua::create([
+            'nama_ortu' => $request->nama_ortu
         ]);
 
         return response()->json([
             'status' => 200,
-            'message' => 'Siswa berhasil ditambahkan!',
-            'siswa' => $siswa
+            'message' => 'Data OrangTua berhasil ditambahkan!',
+            'ortu' => $ortu
         ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(orangTua $orangTua)
     {
         //
     }
@@ -85,7 +73,7 @@ class SiswaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(orangTua $orangTua)
     {
         //
     }
@@ -96,10 +84,8 @@ class SiswaController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id' => 'required|exists:siswas,id',
-            'nama_siswa' => 'required|string|max:255',
-            'kelas_id' => 'required|exists:kelas,id',
-            'ortu_id' => 'required|exists:orang_tuas,id',
+            'id' => 'required|exists:orang_tuas,id',
+            'nama_ortu' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -110,17 +96,17 @@ class SiswaController extends Controller
             ], 422);
         }
 
-        $siswa = Siswa::find($request->id);
-        if ($siswa) {
-            $siswa->update($request->only(['nama_siswa', 'kelas_id', 'ortu_id']));
+        $ortu = orangTua::find($request->id);
+        if ($ortu) {
+            $ortu->update($request->only(['nama_ortu']));
             return response()->json([
                 'status' => 200,
-                'message' => 'Siswa updated successfully'
+                'message' => 'Orang Tua updated successfully'
             ]);
         } else {
             return response()->json([
                 'status' => 404,
-                'message' => 'Siswa not found'
+                'message' => 'Ortu not found'
             ]);
         }
     }
@@ -130,20 +116,20 @@ class SiswaController extends Controller
      */
     public function destroy($id)
     {
-        $siswa = Siswa::find($id);
+        $ortu = orangTua::find($id);
 
-        if (!$siswa) {
+        if (!$ortu) {
             return response()->json([
                 'status' => 404,
-                'message' => 'Siswa tidak ditemukan'
+                'message' => 'Orang Tua tidak ditemukan'
             ]);
         }
 
-        $siswa->delete();
+        $ortu->delete();
 
         return response()->json([
             'status' => 200,
-            'message' => 'Siswa berhasil dihapus'
+            'message' => 'Orang Tua berhasil dihapus'
         ]);
     }
 }

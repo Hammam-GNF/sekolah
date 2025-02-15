@@ -3,9 +3,7 @@
         <thead>
             <tr>
                 <th class="text-center">No</th>
-                <th>Nama Siswa</th>
-                <th>Nama Orang Tua</th>
-                <th>Nama Kelas</th>
+                <th>Nama OrangTua</th>
                 <th class="text-center">Aksi</th>
             </tr>
         </thead>

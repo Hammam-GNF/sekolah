@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\OrangTuaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/guru/update', [GuruController::class, 'update'])->name('guru.update');
     Route::get('/guru/count', [GuruController::class, 'count'])->name('guru.count');
     Route::delete('/guru/delete/{id}', [GuruController::class, 'destroy'])->name('guru.delete');
+
+    // Orang Tua
+    Route::get('/ortu', [OrangTuaController::class, 'index'])->name('ortu.index');
+    Route::get('/ortu/getall', [OrangTuaController::class, 'getall'])->name('ortu.getall');
+    Route::post('/ortu/store', [OrangTuaController::class, 'store'])->name('ortu.store');
+    Route::post('/ortu/update', [OrangTuaController::class, 'update'])->name('ortu.update');
+    Route::get('/ortu/count', [OrangTuaController::class, 'count'])->name('ortu.count');
+    Route::delete('/ortu/delete/{id}', [OrangTuaController::class, 'destroy'])->name('ortu.delete');
 
     // Siswa
     Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');
